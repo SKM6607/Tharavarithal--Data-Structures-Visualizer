@@ -3,7 +3,7 @@ package Windows;
 import java.util.Arrays;
 import java.util.Random;
 
-public class insertionSorting {
+public class InsertionSorting {
     static final int[] array={
             324,23,2,14,2,85,73,2,34,56
     };
