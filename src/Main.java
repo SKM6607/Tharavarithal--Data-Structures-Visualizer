@@ -1,6 +1,8 @@
 import Sound.BackgroundMusic;
 import Windows.LegendDialog;
+import Windows.LinkedList;
 import Windows.LoadingPage;
+import Windows.Sorting;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,88 +10,67 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Main {
+    static final Thread backgroundMusicThread = new Thread(new BackgroundMusic("src/Sound/Granius.wav"));
     private static final int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width,
             screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
-    static void closeChildWindows(){
-        for(Window window: Window.getWindows()){
-            if( window instanceof LegendDialog){
+    private static final String DEFAULT="LoadingPage";
+    private static final String LINKED_LIST="Linked List";
+    private static final String INSERTION_SORTING="Insertion Sort";
+    private static final String SELECTION_SORTING="Selection Sort";
+    private static final String BUBBLE_SORT="Bubble Sort";
+    private static final String QUICK_SORT="Quick Sort";
+    private static final String[] iterator={SELECTION_SORTING,INSERTION_SORTING,BUBBLE_SORT,QUICK_SORT};
+    private static final JMenuBar menuBarMain=new JMenuBar();
+    private static final JMenu sortingMenu=new JMenu("Sorting");
+    private static final JMenu linkedListMenu=new JMenu("Linked List");
+    private static final JMenuItem[] sortingMenuItems=new JMenuItem[4];
+    private static final JMenuItem linkedListMenuItem=new JMenuItem(LINKED_LIST);
+    private static final CardLayout cardLayout=new CardLayout();
+    private static final JPanel cardPanel=new JPanel(cardLayout);
+    private static final JPanel defaultLoadingPage=new LoadingPage();
+    private static final JPanel linkedListPanel=new LinkedList();
+    static {
+        cardPanel.add(defaultLoadingPage,DEFAULT);
+        for (int i = 0; i < sortingMenuItems.length; i++) {
+            sortingMenuItems[i]=new JMenuItem(iterator[i]);
+            cardPanel.add(new Sorting(screenWidth,screenHeight,iterator[i]),iterator[i]);
+            sortingMenu.add(sortingMenuItems[i]);
+        }
+        cardPanel.add(linkedListPanel,LINKED_LIST);
+        linkedListMenu.add(linkedListMenuItem);
+        menuBarMain.add(sortingMenu);
+        menuBarMain.add(linkedListMenu);
+    }
+    static {
+        for (JMenuItem item:sortingMenuItems){
+            item.addActionListener(_->{
+                cardLayout.show(cardPanel, item.getText());
+            });
+        }
+        linkedListMenuItem.addActionListener(_->{
+            cardLayout.show(cardPanel, linkedListMenu.getText());
+        });
+    }
+    private static void closeChildWindows() {
+        for (Window window : Window.getWindows()) {
+            if (window instanceof LegendDialog) {
                 window.dispose();
             }
         }
     }
-    static Thread backgroundMusicThread=new Thread(new BackgroundMusic("src/Sound/Granius.wav"));
     public static void main(String[] args) {
-        JFrame jFrame = new JFrame("VAGAI");
-        jFrame.setSize(screenWidth, screenHeight);
-        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // Loading screen first
-        LoadingPage page = new LoadingPage();
-        jFrame.add(page);
-        backgroundMusicThread.start();
-        AtomicReference<Sorting> sorting = new AtomicReference<>();
+        SwingUtilities.invokeLater(()-> {
+            JFrame jFrame = new JFrame("VAGAI");
+            jFrame.setSize(screenWidth, screenHeight);
+            jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            backgroundMusicThread.start();
+            jFrame.setJMenuBar(menuBarMain);
+            jFrame.add(cardPanel,BorderLayout.CENTER);
+            jFrame.setLayout(cardLayout);
+            cardLayout.show(cardPanel,DEFAULT);
 
-        // Menu setup (but don’t add Sorting yet!)
-        JMenuBar bar = new JMenuBar();
-        JMenu menu = new JMenu("Algorithms");
-        bar.add(menu);
-        menu.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
-
-        JMenuItem[] items = new JMenuItem[4];
-        String[] names = {"Selection Sort", "Insertion Sort", "Bubble Sort", "Quick Sort"};
-        final boolean[] isSelected = {true, false, false, false};
-
-        for (int i = 0; i < items.length; i++) {
-            items[i] = new JMenuItem(names[i]);
-            items[i].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
-            menu.add(items[i]);
-
-            int copy = i;
-            items[i].addActionListener(e -> {
-                if (sorting.get() == null) return; // do nothing until Start is pressed
-
-                // Update colors
-                Arrays.fill(isSelected, false);
-                isSelected[copy] = true;
-                for (int j = 0; j < items.length; j++) {
-                    if (isSelected[j]) {
-                        items[j].setBackground(new Color(241, 96, 96));
-                        items[j].setForeground(new Color(21, 104, 213, 255));
-                        items[j].setOpaque(false);
-                    } else {
-                        items[j].setBackground(Color.WHITE);
-                        items[j].setForeground(Color.BLACK);
-                        items[j].setOpaque(true);
-                    }
-                }
-
-                // Replace sorting panel
-                closeChildWindows();
-                jFrame.remove(sorting.get());
-                sorting.set(new Sorting(screenWidth, screenHeight, e.getActionCommand()));
-                jFrame.add(sorting.get());
-                jFrame.revalidate();
-                jFrame.repaint();
-            });
-        }
-
-        // Apply initial menu item style
-        items[0].setBackground(new Color(241, 96, 96));
-        items[0].setForeground(new Color(21, 104, 213, 255));
-        items[0].setOpaque(false);
-
-        jFrame.setJMenuBar(bar);
-
-        // Only load Sorting after button press
-        JButton controlButton = page.returnControlOfLoadButton();
-        controlButton.addActionListener(_ -> {
-            jFrame.remove(page);
-            sorting.set(new Sorting(screenWidth, screenHeight, "Selection Sort"));
-            jFrame.add(sorting.get());
-            jFrame.revalidate();
-            jFrame.repaint();
+            jFrame.setVisible(true);
         });
-
-        jFrame.setVisible(true);
     }
 
 
