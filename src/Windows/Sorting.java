@@ -27,12 +27,11 @@ public class Sorting extends JPanel {
     private volatile boolean paused = false;
     private Thread thread;
     private Window myParent = SwingUtilities.getWindowAncestor(this);
-
+    private final JDialog legend;
     public Sorting(int width, int height, String menuOption) {
         //setBlock
         {
             currentAlgorithm = menuOption;
-            JDialog legend;
             switch (menuOption) {
                 case "Insertion Sort":
                     map.clear();
@@ -40,7 +39,6 @@ public class Sorting extends JPanel {
                     map.put("Current Comparison", Color.RED);
                     map.put("Finished Sorting", Color.CYAN);
                     legend = new LegendDialog(myParent, "Legend: Insertion Sort", map);
-                    legend.setVisible(true);
                     choice = 1;
                     break;
                 case "Bubble Sort":
@@ -49,7 +47,6 @@ public class Sorting extends JPanel {
                     map.put("Current Comparison", Color.RED);
                     map.put("Finished Sorting", Color.CYAN);
                     legend = new LegendDialog(myParent, "Legend: Bubble Sort", map);
-                    legend.setVisible(true);
                     choice = 2;
                     break;
                 case "Quick Sort":
@@ -59,7 +56,6 @@ public class Sorting extends JPanel {
                     map.put("Swap Elements",Color.RED);
                     map.put("Finished Sorting",Color.CYAN);
                     legend = new LegendDialog(myParent, "Legend: Quick Sort", map);
-                    legend.setVisible(true);
                     choice = 3;
                     break;
                 case "Selection Sort":
@@ -69,12 +65,12 @@ public class Sorting extends JPanel {
                     map.put("Comparisons", Color.YELLOW);
                     map.put("Next Minimum", Color.RED);
                     map.put("Finished Sorting", Color.CYAN);
-                    legend = new LegendDialog(myParent, "Legend: Selection Sort", map);
-                    legend.setVisible(true);
                 default:
+                    legend = new LegendDialog(myParent, "Legend: Selection Sort", map);
                     choice = 0;
                     break;
             }
+            legend.setVisible(false);
             WIDTH = width;
             HEIGHT = height;
             initAnimation();
@@ -82,6 +78,7 @@ public class Sorting extends JPanel {
         add(getUserPanel(), BorderLayout.WEST);
         setBackground(Color.BLACK);
     }
+
 
     private void initAnimation() {
         blocks.clear();
@@ -144,7 +141,9 @@ public class Sorting extends JPanel {
         startButton.setSize(150, 50);
         return startButton;
     }
-
+    public void invokeLegend(){
+        legend.setVisible(true);
+    }
     @Override
     protected void paintComponent(Graphics g1) {
         Graphics2D g = (Graphics2D) g1;

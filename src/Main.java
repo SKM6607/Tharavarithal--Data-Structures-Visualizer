@@ -6,6 +6,7 @@ import Windows.Sorting;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 
 public class Main {
     static final Thread backgroundMusicThread = new Thread(new BackgroundMusic("src/Sound/Granius.wav"));
@@ -24,30 +25,43 @@ public class Main {
     private static final JMenuItem linkedListMenuItem = new JMenuItem(LINKED_LIST);
     private static final CardLayout cardLayout = new CardLayout();
     private static final JPanel cardPanel = new JPanel(cardLayout);
-    private static final JPanel linkedListPanel = new LinkedList();
+    private static final LinkedList linkedListPanel = new LinkedList();
     private static final LoadingPage loadingPage = new LoadingPage();
+    private static final Sorting sortingPanel = new Sorting(screenWidth, screenHeight, "Selection Sort");
+    private static final JPanel linkedListButtonsPanel= linkedListPanel.returnPanel();
     static {
         menuBarMain.setVisible(false);
+        JPanel container=new JPanel(new BorderLayout());
+        JPanel southContainer=new JPanel(new FlowLayout(FlowLayout.CENTER));
+        southContainer.add(linkedListButtonsPanel);
+        container.add(linkedListPanel,BorderLayout.CENTER);
+        container.add(southContainer,BorderLayout.SOUTH);
         for (int i = 0; i < sortingMenuItems.length; i++) {
             sortingMenuItems[i] = new JMenuItem(iterator[i]);
             cardPanel.add(new Sorting(screenWidth, screenHeight, iterator[i]), iterator[i]);
             sortingMenu.add(sortingMenuItems[i]);
-            closeChildWindows();
+            sortingMenuItems[i].setFont(new Font(Font.SANS_SERIF,Font.BOLD,18));
         }
-        cardPanel.add(linkedListPanel, LINKED_LIST);
+        cardPanel.add(container, LINKED_LIST);
         cardPanel.add(loadingPage, DEFAULT);
+        linkedListMenuItem.setFont(new Font(Font.SANS_SERIF,Font.BOLD,18));
         linkedListMenu.add(linkedListMenuItem);
         menuBarMain.add(sortingMenu);
         menuBarMain.add(linkedListMenu);
-    }
-    static {
+        sortingMenu.setFont(new Font(Font.SANS_SERIF,Font.BOLD,18));
+        linkedListMenu.setFont(new Font(Font.SANS_SERIF,Font.BOLD,18));
         for (JMenuItem item : sortingMenuItems) {
-            item.addActionListener(_ -> cardLayout.show(cardPanel, item.getText()));
+            item.addActionListener(_ -> {
+                closeChildWindows();
+                cardLayout.show(cardPanel, item.getText());
+                new Sorting(screenWidth,screenHeight,item.getText()).invokeLegend();
+            });
         }
         linkedListMenuItem.addActionListener(_ -> cardLayout.show(cardPanel, linkedListMenu.getText()));
         loadingPage.returnControlOfLoadButton().addActionListener(_ -> {
             menuBarMain.setVisible(true);
             cardLayout.show(cardPanel, SELECTION_SORTING);
+            sortingPanel.invokeLegend();
         });
     }
     private static void closeChildWindows() {
@@ -74,5 +88,4 @@ public class Main {
             jFrame.setVisible(true);
         });
     }
-
 }

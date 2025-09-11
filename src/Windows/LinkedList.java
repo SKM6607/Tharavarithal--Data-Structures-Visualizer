@@ -15,38 +15,40 @@ public class LinkedList extends JPanel {
     private final int SPACING = 25;
     private final JButton[] button = new JButton[2];
     ArrayList<Node> nodes = new ArrayList<>();
-    boolean initialCondition = false;
-    private JPanel panel;
+    private JPanel mainPanel;
+    private final JButton append;
+    private  final JButton pop;
+    private final JTextField inputText;
     public LinkedList() {
         nodes.add(new Node(0, width / 2 - nodeLength / 2, height / 2 - nodeHeight / 2, true));
-        GridLayout layout = new GridLayout(2, 1,0,10);
-        panel = new JPanel();
-        JTextField textField = appendTextInput();
-        JButton append = new JButton("Append");
-        JButton pop = new JButton("Pop");
-        JPanel sidePanel = new JPanel();
-        GridLayout layoutSide = new GridLayout(1, 2,10,0);
-        sidePanel.setLayout(layoutSide);
-        sidePanel.setBackground(Color.BLACK);
-        sidePanel.add(textField);
-        sidePanel.add(append);
-        panel.setBackground(Color.BLACK);
-        append.addActionListener(_ -> {
-            InputVerifier verifier = textField.getInputVerifier();
-            if (verifier.verify(textField)) {
-                addNode(Integer.parseInt(textField.getText()));
-            }
-        });
-        panel.setLayout(layout);
-        panel.add(sidePanel);
-        panel.add(pop);
-        panel.setPreferredSize(new Dimension(300, 75));
-        add(panel);
+        //setBlock
         {
+            GridLayout layout = new GridLayout(1, 2,0,10);
             button[0] = new JButton("Append");
             button[1] = new JButton("Delete");
             arrow = new MyArrow(nodeLength / 2, 20);
+            inputText = appendTextInput();
+            append = new JButton("APPEND");
+            pop = new JButton("POP");
+            append.setFont(getFont().deriveFont(15f));
+            pop.setFont(getFont().deriveFont(15f));
+            JPanel sidePanel = new JPanel(layout);
+            sidePanel.add(inputText);
+            sidePanel.add(append);
+            sidePanel.setBackground(Color.BLACK);
+            mainPanel=new JPanel(new GridLayout(2,1,5,10));
+            mainPanel.add(sidePanel);
+            mainPanel.add(pop);
+            mainPanel.setBackground(Color.BLACK);
+            mainPanel.setPreferredSize(new Dimension(350,75));
         }
+        append.addActionListener(_ -> {
+            InputVerifier verifier = inputText.getInputVerifier();
+            if (verifier.verify(inputText)) {
+                addNode(Integer.parseInt(inputText.getText()));
+                inputText.setText("");
+            }
+        });
         repaint();
         setBackground(Color.BLACK);
     }
@@ -67,18 +69,6 @@ public class LinkedList extends JPanel {
         });
         textField.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 15));
         return textField;
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame();
-            JScrollPane pane=new JScrollPane(new LinkedList());
-            frame.setLayout(new BorderLayout());
-            frame.add(pane,BorderLayout.CENTER);
-            frame.setSize(new Dimension(width, height));
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setVisible(true);
-        });
     }
 
     @Override
@@ -131,7 +121,6 @@ public class LinkedList extends JPanel {
         if (startX > getPreferredSize().width) {
             width=startX;
             setPreferredSize(new Dimension(startX, getPreferredSize().height));
-            revalidate();
         }
         SwingUtilities.invokeLater(()-> {
             Rectangle newNormal = new Rectangle(node.x, node.y, 2 * nodeLength, nodeHeight);
@@ -146,17 +135,9 @@ public class LinkedList extends JPanel {
             throw new RuntimeException(e);
         }
     }
-
-    void popNode(){
-        if(nodes.size()!=1)nodes.removeLast();
-        nodes.getLast().isLast=true;
-        int newX=nodes.getLast().x;
-        if(newX < getPreferredSize().width-2*nodeLength){
-            Rectangle newNormal = new Rectangle(nodes.getLast().x, nodes.getLast().y, 2 * nodeLength, nodeHeight);
-            newNormal.x = nodes.getLast().x - (getParent().getWidth() - nodeLength) / 2;
-            newNormal.width = getParent().getWidth();
-            scrollRectToVisible(newNormal);
-        }
+    @NotNull
+    public JPanel returnPanel(){
+        return mainPanel;
     }
     private static final class Node {
         public final String ownAddress;
