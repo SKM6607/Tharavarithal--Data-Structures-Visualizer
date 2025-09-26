@@ -134,12 +134,13 @@ public class Main implements MacroInterface {
             jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             jFrame.setBackground(themeColorBG);
             jFrame.setForeground(foreGroundBG);
-            backgroundMusicThread.start();
+//            backgroundMusicThread.start();
             jFrame.add(cardPanel, BorderLayout.CENTER);
             jFrame.setLayout(cardLayout);
             jFrame.setJMenuBar(menuBarMain);
             cardLayout.show(cardPanel, DEFAULT);
             jFrame.setVisible(true);
         });
+        System.out.println("Changes in ");
     }
 }
