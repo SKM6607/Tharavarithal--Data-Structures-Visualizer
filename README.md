@@ -49,7 +49,6 @@ Vagai(**Vagai+Paduthal** transl. **Sorting**) is a Java-based application that r
 1. **Clone the repository**  
 2. **Have an IDE like IntelliJ if you are aiming to learn JAVA Swing**
 ---
-### Version
 ***Current Version: 0.0.3***
 ---
 ### Class Diagram
