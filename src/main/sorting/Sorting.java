@@ -7,6 +7,7 @@ import main.interfaces.MacroInterface;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -15,19 +16,21 @@ public sealed abstract class Sorting
         implements MacroInterface, GridInterface
         permits SelectionSort, InsertionSort, BubbleSort, QuickSort {
     protected final int widthX = 20;
-    protected String algoName;
     protected final ArrayList<ArrayBlock> blocks = new ArrayList<>();
     public LegendDialog legendDialog;
+    protected String algoName;
     protected Map<String, Color> legend;
     protected Window parentWindow;
-
     public Sorting(JPanel parent) {
         parentWindow = SwingUtilities.getWindowAncestor(parent);
-        algoName=null;
+        algoName = null;
+        legend=new HashMap<>();
     }
-    public final String getAlgoName(){
+
+    public final String getAlgoName() {
         return algoName;
     }
+
     protected final void initAnimation() {
         blocks.clear();
         Random random = new Random();
@@ -40,18 +43,31 @@ public sealed abstract class Sorting
         repaint();
     }
 
+    @Override
+    protected void paintComponent(Graphics g1) {
+        Graphics2D g = (Graphics2D) g1;
+        //Set Background
+        {
+            g1.setColor(Color.BLACK);
+            g1.fillRect(0, 0, WIDTH, HEIGHT);
+            drawGrid(g, new Color(0x1C233D));
+        }
+        drawElements(g);
+    }
+
     public abstract void sort();
 
-    public final void increaseBlocksByOne() {
+    public final void setBlocksByN(int N) {
+        clearBlocks();
         Random random = new Random();
         int spacingX = 10;
         int randomRange = random.nextInt(10, 500);
-        blocks.add(new ArrayBlock(blocks.getLast().x += widthX + spacingX, HEIGHT - 200, randomRange, Color.WHITE));
+        for (int i = 0; i < N; i++)
+            blocks.add(new ArrayBlock(blocks.getLast().x += widthX + spacingX, HEIGHT - 200, randomRange, Color.WHITE));
     }
 
-    public final void decreaseBlocksByOne() {
-        Random random = new Random();
-        blocks.removeLast();
+    public final void clearBlocks() {
+        blocks.clear();
     }
 
     public final void invokeLegend() {

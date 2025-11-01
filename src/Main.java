@@ -32,7 +32,7 @@ public class Main implements MacroInterface {
     private static final CardLayout cardLayout = new CardLayout();
     private static final JPanel cardPanel = new JPanel(cardLayout);
     private static final LoadingPage loadingPage = new LoadingPage();
-    private static final SortingManager SORTING_MANAGER_PANEL = new SortingManager(width, height, SELECTION_SORTING);
+    private static final SortingManager SORTING_MANAGER_PANEL = new SortingManager(SELECTION_SORTING);
     private static final LinkedListImplementation linkedListPanel= new LinkedListImplementation();
     private static final LinkedListCycleDetection cycleDetectionPanel = new LinkedListCycleDetection();
     private static final StackWindowUsable stackWindow=new StackWindowUsable();
@@ -53,7 +53,7 @@ public class Main implements MacroInterface {
         sortingMenu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         for (int i = 0; i < sortingMenuItems.length; i++) {
             sortingMenuItems[i] = new JMenuItem(IDENTIFIER_ARRAY[i]);
-            cardPanel.add(new SortingManager(width,height , IDENTIFIER_ARRAY[i]), IDENTIFIER_ARRAY[i]);
+            cardPanel.add(new SortingManager( IDENTIFIER_ARRAY[i]), IDENTIFIER_ARRAY[i]);
             sortingMenu.
                     add(sortingMenuItems[i]).
                     setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -148,7 +148,7 @@ public class Main implements MacroInterface {
             item.addActionListener(e -> {
                 closeChildWindows();
                 cardLayout.show(cardPanel, item.getText());
-                new SortingManager(width,height,item.getText()).invokeLegend();
+                new SortingManager(item.getText());
             });
         }
         linkedListMenuItem.addActionListener(e -> {
@@ -163,7 +163,6 @@ public class Main implements MacroInterface {
             closeQRWindow();
             menuBarMain.setVisible(true);
             cardLayout.show(cardPanel, SELECTION_SORTING);
-            SORTING_MANAGER_PANEL.invokeLegend();
         });
         stackMenuItem.addActionListener(e -> {
             closeChildWindows();
